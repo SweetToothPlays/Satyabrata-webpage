@@ -1,72 +1,528 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Satyabrata Panda - Personal Webpage</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Satyabrata Panda | Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* Custom Styles & Animations */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0c111d; /* Even darker blue */
+            color: #E5E7EB;
+            cursor: none; /* Hide default cursor */
+        }
+
+        /* Animated Background */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* Custom Cursor */
+        #cursor-dot, #cursor-outline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transition: all 0.15s ease-out;
+        }
+        #cursor-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #38bdf8;
+        }
+        #cursor-outline {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #38bdf8;
+        }
+        body:has(a:hover, button:hover) #cursor-outline {
+            transform: translate(-50%, -50%) scale(1.5);
+            opacity: 0.5;
+        }
+
+        /* Advanced Glass Card Effect */
+        .glass-card {
+            background: rgba(31, 41, 55, 0.4);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        .glass-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 40px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        /* Section Animation */
+        .section {
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+            opacity: 0;
+            transform: translateY(40px);
+        }
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Navigation Link Style */
+        .nav-link {
+            position: relative;
+            transition: color 0.3s;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #38bdf8;
+            transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        .nav-link:hover::after, .nav-link.active::after {
+            width: 100%;
+        }
+
+        /* Animated Headline */
+        .animated-heading span {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: reveal-text 0.8s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+        }
+        @keyframes reveal-text {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Stylish Buttons */
+        .btn-primary, .btn-secondary {
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px -10px #38bdf8;
+        }
+        .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px -10px #38bdf8;
+        }
+        
+    </style>
 </head>
-<body>
-    <header>
-        <h1>Satyabrata Panda</h1>
-        <p>Computer Science Student</p>
+<body class="antialiased">
+
+    <div id="cursor-dot"></div>
+    <div id="cursor-outline"></div>
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- Header & Navigation -->
+    <header id="header" class="bg-gray-900/50 backdrop-blur-sm fixed top-0 left-0 right-0 z-50 transition-all duration-300">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold text-white">Satyabrata Panda</a>
+            <nav class="hidden md:flex space-x-8">
+                <a href="#home" class="nav-link text-gray-300 hover:text-sky-400 active">Home</a>
+                <a href="#about" class="nav-link text-gray-300 hover:text-sky-400">About</a>
+                <a href="#skills" class="nav-link text-gray-300 hover:text-sky-400">Skills</a>
+                <a href="#projects" class="nav-link text-gray-300 hover:text-sky-400">Projects</a>
+                <a href="#experience" class="nav-link text-gray-300 hover:text-sky-400">Experience</a>
+                <a href="#education" class="nav-link text-gray-300 hover:text-sky-400">Education</a>
+                <a href="#contact" class="nav-link text-gray-300 hover:text-sky-400">Contact</a>
+            </nav>
+            <button id="mobile-menu-button" class="md:hidden text-gray-300 focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4">
+            <a href="#home" class="block py-2 text-gray-300 hover:text-sky-400">Home</a>
+            <a href="#about" class="block py-2 text-gray-300 hover:text-sky-400">About</a>
+            <a href="#skills" class="block py-2 text-gray-300 hover:text-sky-400">Skills</a>
+            <a href="#projects" class="block py-2 text-gray-300 hover:text-sky-400">Projects</a>
+            <a href="#experience" class="block py-2 text-gray-300 hover:text-sky-400">Experience</a>
+            <a href="#education" class="block py-2 text-gray-300 hover:text-sky-400">Education</a>
+            <a href="#contact" class="block py-2 text-gray-300 hover:text-sky-400">Contact</a>
+        </div>
     </header>
-    <div class="container">
-        <div class="card">
-            <div class="front">
-                <p class="click-here">Click here</p>
-            </div>
-            <div class="back">
-                <h2>About Me</h2>
-                <p>A Computer Science and Engineering student with a strong foundation in programming and full-stack 
-web development. Proficient in Java, C, C++, JavaScript, TypeScript, and Python. Experience working 
-with React.js, Next.js, Node.js, and databases like MongoDB, Firebase and SQL.
-</p>
-                <div class="contact-info">
-                    <p>Contact me at: <a href="mailto:satyabratapandaaims@gmail.com">satyabratapandaaims@gmail.com</a></p>
-                </div>
-                <div class="social-buttons">
-                    <a href="https://github.com/SatyabrataPanda42" target="_blank" class="btn github">GitHub</a>
-                    <a href="https://x.com/psatyabrata25?t=A16WHxtvmxxgtYnwhCw20w&s=09" target="_blank" class="btn twitter">X</a>
-                    <a href="https://www.instagram.com/satyabratapanda._?igsh=bWsxcWJ0YXJ3eTNz" target="_blank" class="btn instagram">Instagram</a>
+
+    <main class="pt-20">
+
+        <!-- Home Section -->
+        <section id="home" class="min-h-screen flex items-center justify-center text-center section">
+            <div class="container mx-auto px-6">
+                <h1 class="animated-heading text-4xl md:text-6xl font-bold text-white leading-tight">Satyabrata Panda</h1>
+                <p class="text-xl md:text-2xl text-sky-300 mt-4">B.Tech. - Computer Science & Engineering</p>
+                <p class="text-gray-400 mt-2">Cuttack, Odisha, India</p>
+                <div class="mt-8 space-x-4">
+                    <a href="#contact" class="btn-primary bg-sky-500 hover:bg-sky-600 text-white font-bold py-3 px-8 rounded-full">Contact Me</a>
+                    <a href="https://www.linkedin.com/in/satyabrata-panda-182975264" target="_blank" class="btn-secondary border-2 border-sky-500 text-sky-500 hover:bg-sky-500 hover:text-white font-bold py-3 px-8 rounded-full">
+                        View LinkedIn
+                    </a>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div class="skills">
-            <h3>Skills</h3>
-            <ul>
-                <li>Analytical and Problem-Solving</li>
-                <li>Languages: Java, C, C++,  JavaScript, TypeScript, Python(Numpy, Pandas)</li>
-                <li>Frameworks and Tools:  Node JS, React JS, Next JS, jQuery, Tailwind CSS, Bootstrap 5.0</li>
-                <li>Databases: MongoDB, SQL</li> 
-                <li>Effective Communication and Interpersonal Skills</li>
-            </ul>
-        </div>
+        <!-- About Section -->
+        <section id="about" class="py-20 section">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-12 text-white">About Me</h2>
+                <div class="max-w-4xl mx-auto glass-card rounded-xl p-8">
+                    <div class="flex flex-col md:flex-row items-center gap-12">
+                        <!-- Profile Picture -->
+                        <div class="w-48 h-48 md:w-56 md:h-56 flex-shrink-0">
+                            <img src="satya.jpg"
+                                 alt="Satyabrata Panda"
+                                 class="rounded-full w-full h-full object-cover border-4 border-sky-500/50 shadow-lg"
+                                 onerror="this.onerror=null;this.src='https://placehold.co/224x224/1f2937/e5e7eb?text=SP';">
+                        </div>
+                        <!-- About Text -->
+                        <div>
+                            <p class="text-lg text-gray-300 leading-relaxed">
+                                A Computer Science and Engineering student with a strong foundation in programming and full-stack web development. Proficient in Java, C, C++, JavaScript, TypeScript, and Python. Experience working with React.js, Next.js, Node.js, and databases like MongoDB, Firebase and SQL.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-        <div class="education">
-            <h3>Education</h3>
-             <p><strong>Bachelor of Technology</strong><br>
-            Computer Science and Engineering<br>
-            Siksha O Anusandhan | 2024-2026</p>
-            <p><strong>Senior Secondary School</strong><br>
-            Science Stream<br>
-            Prabhujee English Medium School | 2020-2022</p>
+        <!-- Skills Section -->
+        <section id="skills" class="py-20 bg-gray-900/50 section">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-16 text-white">Skills</h2>
+                <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
+                    <div>
+                        <h3 class="text-2xl font-semibold text-sky-300 mb-4 text-center">Languages</h3>
+                        <div class="flex flex-wrap justify-center gap-3">
+                            <span class="skill-tag text-gray-200 font-medium py-2 px-4 rounded-lg transition-transform hover:scale-110">Java</span>
+                            <span class="skill-tag text-gray-200 font-medium py-2 px-4 rounded-lg transition-transform hover:scale-110">C</span>
+                            <span class="skill-tag text-gray-200 font-medium py-2 px-4 rounded-lg transition-transform hover:scale-110">C++</span>
+                            <span class="skill-tag text-gray-200 font-medium py-2 px-4 rounded-lg transition-transform hover:scale-110">JavaScript</span>
+                            <span class="skill-tag text-gray-200 font-medium py-2 px-4 rounded-lg transition-transform hover:scale-110">TypeScript</span>
+                            <span class="skill-tag text-gray-200 font-medium py-2 px-4 rounded-lg transition-transform hover:scale-110">Python</span>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-semibold text-sky-300 mb-4 text-center">Frameworks & Tools</h3>
+                        <div class="flex flex-wrap justify-center gap-3">
+                            <span class="skill-tag text-gray-200 font-medium py-2 px-4 rounded-lg transition-transform hover:scale-110">Node.js</span>
+                            <span class="skill-tag text-gray-200 font-medium py-2 px-4 rounded-lg transition-transform hover:scale-110">React.js</span>
+                            <span class="skill-tag text-gray-200 font-medium py-2 px-4 rounded-lg transition-transform hover:scale-110">Next.js</span>
+                            <span class="skill-tag text-gray-200 font-medium py-2 px-4 rounded-lg transition-transform hover:scale-110">jQuery</span>
+                            <span class="skill-tag text-gray-200 font-medium py-2 px-4 rounded-lg transition-transform hover:scale-110">Tailwind CSS</span>
+                            <span class="skill-tag text-gray-200 font-medium py-2 px-4 rounded-lg transition-transform hover:scale-110">Bootstrap 5</span>
+                            <span class="skill-tag text-gray-200 font-medium py-2 px-4 rounded-lg transition-transform hover:scale-110">VS Code</span>
+                            <span class="skill-tag text-gray-200 font-medium py-2 px-4 rounded-lg transition-transform hover:scale-110">Git</span>
+                            <span class="skill-tag text-gray-200 font-medium py-2 px-4 rounded-lg transition-transform hover:scale-110">GitHub</span>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-semibold text-sky-300 mb-4 text-center">Databases</h3>
+                        <div class="flex flex-wrap justify-center gap-3">
+                            <span class="skill-tag text-gray-200 font-medium py-2 px-4 rounded-lg transition-transform hover:scale-110">MongoDB</span>
+                            <span class="skill-tag text-gray-200 font-medium py-2 px-4 rounded-lg transition-transform hover:scale-110">SQL</span>
+                            <span class="skill-tag text-gray-200 font-medium py-2 px-4 rounded-lg transition-transform hover:scale-110">Firebase</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section id="projects" class="py-20 section">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-12 text-white">Projects</h2>
+                <div class="max-w-4xl mx-auto space-y-12">
+                    <!-- Project 1 -->
+                    <div class="glass-card rounded-xl p-8">
+                        <h3 class="text-2xl font-bold text-white mb-2">Hire Ready - AI-Powered Interview Preparation Platform</h3>
+                        <div class="flex flex-wrap gap-2 my-4">
+                            <span class="skill-tag bg-sky-900/50 text-sky-300 text-xs font-semibold py-1 px-3 rounded-full">React.js</span>
+                            <span class="skill-tag bg-sky-900/50 text-sky-300 text-xs font-semibold py-1 px-3 rounded-full">Next.js</span>
+                            <span class="skill-tag bg-sky-900/50 text-sky-300 text-xs font-semibold py-1 px-3 rounded-full">Node.js</span>
+                            <span class="skill-tag bg-sky-900/50 text-sky-300 text-xs font-semibold py-1 px-3 rounded-full">Firebase</span>
+                            <span class="skill-tag bg-sky-900/50 text-sky-300 text-xs font-semibold py-1 px-3 rounded-full">Vapi</span>
+                             <span class="skill-tag bg-sky-900/50 text-sky-300 text-xs font-semibold py-1 px-3 rounded-full">Gemini</span>
+                        </div>
+                        <p class="text-gray-300 leading-relaxed mb-4">
+                            Designed and developed a full-stack AI interview platform that enables users to practice real-time mock interviews with voice interaction and receive thoughtful, personalised feedback.
+                        </p>
+                        <div class="mt-6 flex items-center gap-4">
+                            <a href="https://hireready-two.vercel.app/signin" class="text-sky-400 hover:text-sky-300 font-semibold flex items-center gap-2">Live <i class="fas fa-external-link-alt"></i></a>
+                            <a href="https://github.com/SatyabrataPanda42/HireReady" class="text-sky-400 hover:text-sky-300 font-semibold flex items-center gap-2">GitHub <i class="fab fa-github"></i></a>
+                        </div>
+                    </div>
+                    <!-- Project 2 -->
+                    <div class="glass-card rounded-xl p-8">
+                        <h3 class="text-2xl font-bold text-white mb-2">FinanTrack: A Platform For Managing Your Finance</h3>
+                         <div class="flex flex-wrap gap-2 my-4">
+                            <span class="skill-tag bg-sky-900/50 text-sky-300 text-xs font-semibold py-1 px-3 rounded-full">React.js</span>
+                            <span class="skill-tag bg-sky-900/50 text-sky-300 text-xs font-semibold py-1 px-3 rounded-full">Next.js</span>
+                            <span class="skill-tag bg-sky-900/50 text-sky-300 text-xs font-semibold py-1 px-3 rounded-full">Node.js</span>
+                            <span class="skill-tag bg-sky-900/50 text-sky-300 text-xs font-semibold py-1 px-3 rounded-full">MongoDB</span>
+                        </div>
+                        <p class="text-gray-300 leading-relaxed mb-4">
+                           Created a full-stack web application to help users simplify and take control of their financial lives through easy expense and income tracking.
+                        </p>
+                         <div class="mt-6 flex items-center gap-4">
+                            <a href="https://fin-track-sweettoothplays-projects.vercel.app/" class="text-sky-400 hover:text-sky-300 font-semibold flex items-center gap-2">Live <i class="fas fa-external-link-alt"></i></a>
+                            <a href="https://github.com/SatyabrataPanda42/FinTrack" class="text-sky-400 hover:text-sky-300 font-semibold flex items-center gap-2">GitHub <i class="fab fa-github"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Experience Section -->
+        <section id="experience" class="py-20 bg-gray-900/50 section">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-12 text-white">Experience</h2>
+                <div class="max-w-4xl mx-auto">
+                    <div class="glass-card rounded-xl p-8 relative">
+                        <div class="absolute top-8 left-8 border-l-2 border-sky-500 h-[calc(100%-4rem)]"></div>
+                        <div class="pl-12">
+                            <div class="mb-8">
+                                <div class="flex items-center mb-2">
+                                     <div class="bg-sky-500 rounded-full w-4 h-4 -ml-[56px] border-4 border-gray-800"></div>
+                                     <h3 class="text-xl font-bold text-white ml-4">ServiceNow Trainee</h3>
+                                </div>
+                                <p class="text-sky-300 mb-2">ServiceNow | June 2025 - Present</p>
+                                <p class="text-gray-400 leading-relaxed">
+                                    Developed hands-on skills in ITSM, Flow Designer, Service Catalog, CMDB and scoped applications. Designed workflows, forms, tables, and implemented Business Rules, Client Scripts, and UI Policies.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Awards Section -->
+        <section id="awards" class="py-20 section">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-12 text-white">Achievements</h2>
+                <div class="max-w-2xl mx-auto">
+                    <div class="glass-card rounded-lg p-6 flex items-center justify-center text-center">
+                         <svg class="w-8 h-8 text-yellow-400 mr-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path></svg>
+                        <p class="text-lg font-semibold text-gray-200">Reliance Foundation Undergraduate Scholar (Ranked in TOP 5000 among 100,000+ contestants)</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Education Section -->
+        <section id="education" class="py-20 bg-gray-900/50 section">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-12 text-white">Education</h2>
+                <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="glass-card rounded-xl p-8">
+                        <h3 class="text-xl font-bold text-white">Siksha 'O' Anusandhan University</h3>
+                        <p class="text-sky-300 mt-1">B.Tech. Computer Science & Engineering (CGPA: 9.01)</p>
+                        <p class="text-gray-400 mt-1">2022 - 2026</p>
+                    </div>
+                    <div class="glass-card rounded-xl p-8">
+                        <h3 class="text-xl font-bold text-white">Prabhujee English Medium School</h3>
+                        <p class="text-sky-300 mt-1">CBSE 12th Board, Science (67%)</p>
+                        <p class="text-gray-400 mt-1">2020 - 2022</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="py-20 section">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-3xl font-bold mb-4 text-white">Get In Touch</h2>
+                <p class="text-gray-400 mb-8 max-w-2xl mx-auto">I'm always open to discussing new projects, creative ideas or opportunities to be part of your visions. Feel free to reach out to me.</p>
+                <div class="flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-8">
+                     <a href="tel:+919040034693" class="flex items-center text-lg text-gray-300 hover:text-sky-400 transition-colors">
+                        <i class="fas fa-phone mr-2"></i>
+                        +91-9040034693
+                    </a>
+                    <a href="mailto:satyabratapandaaims@gmail.com" class="flex items-center text-lg text-gray-300 hover:text-sky-400 transition-colors">
+                        <i class="fas fa-envelope mr-2"></i>
+                        satyabratapandaaims@gmail.com
+                    </a>
+                    <a href="https://www.linkedin.com/in/satyabrata-panda/" target="_blank" class="flex items-center text-lg text-gray-300 hover:text-sky-400 transition-colors">
+                        <i class="fab fa-linkedin mr-2"></i>
+                        LinkedIn
+                    </a>
+                     <a href="https://github.com/SatyabrataPanda42" target="_blank" class="flex items-center text-lg text-gray-300 hover:text-sky-400 transition-colors">
+                        <i class="fab fa-github mr-2"></i>
+                        GitHub
+                    </a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 border-t border-gray-800">
+        <div class="container mx-auto px-6 py-4 text-center text-gray-500">
+            <p>&copy; 2024 Satyabrata Panda. All Rights Reserved.</p>
         </div>
-        <div class="skills">
-            <h3>Projects</h3>
-            <p><strong>Trendora : E-commerce Website</strong><br>
-            Tech Stack: HTML, CSS, JavaScript</p>
-             <p><strong>Finan Track: A Platform For Managing Your Finance</strong><br>
-          Tech Stack: React.js, Next.js, TypeScript, Tailwind CSS,  Node.js, MongoDB
-            </p>
-             <p><strong>Hire Ready:  AI-Powered Interview Preparation Platform</strong><br>
-           Tech Stack: React.js, Next.js, TypeScript, Tailwind CSS, Node.js, Firebase, Vapi, Gemini
-            </p>
-        </div>
-    </div>
-    <footer>
-        <p>&copy; 2024 Satyabrata Panda. All rights reserved.</p>
     </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- Mobile Menu ---
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+
+            // --- Header Shadow on Scroll ---
+            const header = document.getElementById('header');
+            window.addEventListener('scroll', () => {
+                header.classList.toggle('shadow-lg', window.scrollY > 50);
+            });
+            
+            // --- Section Fade-in Animation on Scroll ---
+            const sections = document.querySelectorAll('.section');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+            sections.forEach(section => observer.observe(section));
+
+            // --- Active Nav Link Highlighting ---
+            const sectionObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.getAttribute('id');
+                        document.querySelectorAll('nav a.active').forEach(link => link.classList.remove('active'));
+                        const newActiveLink = document.querySelector(`nav a[href="#${id}"]`);
+                        if(newActiveLink) newActiveLink.classList.add('active');
+                    }
+                });
+            }, { rootMargin: '-40% 0px -40% 0px' });
+            document.querySelectorAll('section[id]').forEach(section => sectionObserver.observe(section));
+
+            // --- Close Mobile Menu on Link Click ---
+            document.querySelectorAll('#mobile-menu a').forEach(link => {
+                link.addEventListener('click', () => mobileMenu.classList.add('hidden'));
+            });
+
+            // --- Animated Heading Text ---
+            const heading = document.querySelector('.animated-heading');
+            if (heading) {
+                const text = heading.textContent;
+                const wrappedText = text.split('').map(char => `<span>${char === ' ' ? '&nbsp;' : char}</span>`).join('');
+                heading.innerHTML = wrappedText;
+                heading.querySelectorAll('span').forEach((span, index) => {
+                    span.style.animationDelay = `${index * 0.05}s`;
+                });
+            }
+
+            // --- Custom Cursor ---
+            const cursorDot = document.getElementById('cursor-dot');
+            const cursorOutline = document.getElementById('cursor-outline');
+            window.addEventListener('mousemove', e => {
+                cursorDot.style.left = `${e.clientX}px`;
+                cursorDot.style.top = `${e.clientY}px`;
+                cursorOutline.style.left = `${e.clientX}px`;
+                cursorOutline.style.top = `${e.clientY}px`;
+            });
+
+            // --- Particle Background Animation ---
+            const canvas = document.getElementById('particle-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            let particlesArray;
+
+            const mouse = { x: null, y: null, radius: (canvas.height/120) * (canvas.width/120) };
+            window.addEventListener('mousemove', e => {
+                mouse.x = e.x;
+                mouse.y = e.y;
+            });
+
+            class Particle {
+                constructor(x, y, directionX, directionY, size, color) {
+                    this.x = x;
+                    this.y = y;
+                    this.directionX = directionX;
+                    this.directionY = directionY;
+                    this.size = size;
+                    this.color = color;
+                }
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+                    ctx.fillStyle = 'rgba(56, 189, 248, 0.5)';
+                    ctx.fill();
+                }
+                update() {
+                    if (this.x > canvas.width || this.x < 0) this.directionX = -this.directionX;
+                    if (this.y > canvas.height || this.y < 0) this.directionY = -this.directionY;
+                    
+                    let dx = mouse.x - this.x;
+                    let dy = mouse.y - this.y;
+                    let distance = Math.sqrt(dx*dx + dy*dy);
+                    if (distance < mouse.radius + this.size){
+                        if(mouse.x < this.x && this.x < canvas.width - this.size * 10) this.x += 5;
+                        if(mouse.x > this.x && this.x > this.size * 10) this.x -= 5;
+                        if(mouse.y < this.y && this.y < canvas.height - this.size * 10) this.y += 5;
+                        if(mouse.y > this.y && this.y > this.size * 10) this.y -= 5;
+                    }
+                    this.x += this.directionX;
+                    this.y += this.directionY;
+                    this.draw();
+                }
+            }
+
+            function initParticles() {
+                particlesArray = [];
+                let numberOfParticles = (canvas.height * canvas.width) / 9000;
+                for (let i=0; i < numberOfParticles; i++) {
+                    let size = (Math.random() * 2) + 1;
+                    let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
+                    let y = (Math.random() * ((innerHeight - size * 2) - (size * 2)) + size * 2);
+                    let directionX = (Math.random() * .4) - 0.2;
+                    let directionY = (Math.random() * .4) - 0.2;
+                    particlesArray.push(new Particle(x, y, directionX, directionY, size));
+                }
+            }
+
+            function animateParticles() {
+                requestAnimationFrame(animateParticles);
+                ctx.clearRect(0,0,innerWidth, innerHeight);
+                for (let i=0; i<particlesArray.length; i++) {
+                    particlesArray[i].update();
+                }
+            }
+
+            initParticles();
+            animateParticles();
+
+            window.addEventListener('resize', () => {
+                canvas.width = innerWidth;
+                canvas.height = innerHeight;
+                mouse.radius = (canvas.height/120) * (canvas.width/120);
+                initParticles();
+            });
+        });
+    </script>
+
 </body>
 </html>
